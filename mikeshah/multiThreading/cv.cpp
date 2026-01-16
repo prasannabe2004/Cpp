@@ -10,15 +10,12 @@ std::condition_variable gConditionVariable;
 
 int main() {
     int result = 0;
-    bool notified = false;
 
     // Reporting thread
     // Must wait on work, done by the working thread
     std::thread reporter([&] {
         std::unique_lock<std::mutex> lock(gLock);
-        if (!notified) {
-            gConditionVariable.wait(lock);
-        }
+        gConditionVariable.wait(lock);
         std::cout << "Reporter, result is: " << result << std::endl;
     });
 
@@ -28,7 +25,6 @@ int main() {
         // Do our work, because we have the lock
         result = 42 + 1 + 7;
         // Our work is done
-        notified = true;
         std::this_thread::sleep_for(std::chrono::seconds(5));
         std::cout << "Work complete\n";
         // Wake up a thread, that is waiting, for some
