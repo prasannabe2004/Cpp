@@ -2,7 +2,8 @@
 /*
    A simple example of using SFML with multiple threads to update a grid of
 shapes. Each thread updates a cell in the grid independently, changing its color
-every second.
+every second. No synchronization is required because each thread works on
+a different cell.
 
 Install:
 sudo apt-get install libcsfml-dev
@@ -18,7 +19,6 @@ Run:
 #include <chrono>     // For sleep
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <thread>
 #include <vector>
 
