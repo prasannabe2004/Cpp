@@ -4,7 +4,7 @@
 #include <thread>
 #include <vector>
 
-static std::atomic<int> shared_value = 0;
+static std::atomic<int> shared_value(0);
 
 void shared_value_increment() { shared_value += 1; }
 
