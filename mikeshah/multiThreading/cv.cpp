@@ -1,0 +1,40 @@
+// @file cv.cpp
+#include <chrono>
+#include <condition_variable>
+#include <iostream>
+#include <mutex>
+#include <thread>
+
+std::mutex gLock;
+std::condition_variable gConditionVariable;
+
+int main() {
+    int result = 0;
+
+    // Reporting thread
+    // Must wait on work, done by the working thread
+    std::thread reporter([&] {
+        std::unique_lock<std::mutex> lock(gLock);
+        gConditionVariable.wait(lock);
+        std::cout << "Reporter, result is: " << result << std::endl;
+    });
+
+    // Working thread
+    std::thread worker([&] {
+        std::unique_lock<std::mutex> lock(gLock);
+        // Do our work, because we have the lock
+        result = 42 + 1 + 7;
+        // Our work is done
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::cout << "Work complete\n";
+        // Wake up a thread, that is waiting, for some
+        // condition to be true
+        gConditionVariable.notify_one();
+    });
+
+    reporter.join();
+    worker.join();
+
+    std::cout << "Program complete" << std::endl;
+    return 0;
+}
